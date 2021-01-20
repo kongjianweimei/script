@@ -1,12 +1,12 @@
 
-name: BBB
+name: BBB1
 
 on:
   workflow_dispatch:
   schedule:
      - cron: '0 7-23/2 * * *'
   watch:
-    types: BBB
+    types: BBB1
 env:
   TZ: Asia/Shanghai
  
@@ -31,7 +31,7 @@ jobs:
           npm install -g npm
           npm update
           npm install got
-      - name: '运行 【BBB2】'
+      - name: '运行 【BBB1】'
         if: env.1BBB_ck
         run: |
           cd ~/Scripts
