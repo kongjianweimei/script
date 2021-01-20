@@ -32,12 +32,12 @@ jobs:
           npm update
           npm install got
       - name: '运行 【BBB1】'
-        if: env.1BBB_ck
+        if: env.BBB1_ck
         run: |
           cd ~/Scripts
           node BBB.js
         env:
-          BBB_ck: ${{ secrets.1BBB_ck }}
+          BBB_ck: ${{ secrets.BBB1_ck }}
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
