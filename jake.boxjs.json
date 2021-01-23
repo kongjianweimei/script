@@ -69,7 +69,7 @@
   {
       "id": "BAIDU",
       "name": "百度签到",
-      "keys": ["chavy_cookie_tieba","chavy_cookie_tieba2","chavy_cookie_tieba3","chavy_cookie_tieba4","chavy_cookie_tieba5","chavy_cookie_tieba6","chavy_cookie_tieba7","chavy_cookie_tieba8"],
+      "keys": ["chavy_cookie_tieba"],
       "settings": [
         { "id": "CFG_tieba_isOrderBars", "name": "按连签排序", "val": false, "type": "boolean", "desc": "默认按经验排序" },
         { "id": "CFG_tieba_maxShowBars", "name": "每页显示数", "val": 15, "type": "number", "desc": "每页最显示多少个吧信息" },
