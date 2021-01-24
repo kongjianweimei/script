@@ -35,7 +35,7 @@ let notice = ''
 let CookieVal = $.getdata('bbb_ck')
 
 if ($.isNode()) {
-    if (process.env.BBB_ck && process.env.BBB_ck.indexOf('#') > -1) {
+      if (process.env.BBB_ck && process.env.BBB_ck.indexOf('#') > -1) {
    CookieVal = process.env.BBB_ck.split('#');
    console.log(`您选择的是用"#"隔开\n`)
   }
@@ -68,7 +68,7 @@ if(CookieVal)$.setdata(CookieVal,'bbb_ck')
    }
 } else {
 !(async () => {
-    for (let i = 0; i < CookieValArr.length; i++) {
+        for (let i = 0; i < CookieValArr.length; i++) {
         if(CookieValArr[i]){
             CookieVal = CookieValArr[i];
              $.index = i + 1;
@@ -77,20 +77,23 @@ if(CookieVal)$.setdata(CookieVal,'bbb_ck')
 
 $.msg($.name,"開始🎉🎉🎉")
 
-      await userInfo()
+      await cashCheck()
       await signIn()
+      await checkWaterNum()
       await zaoWanDkInfo()
       await sleepStatus()
-      await checkWaterNum()
       await clickTaskStatus()
       await watchTaskStatus()
-      await helpStatus()
+      //await helpStatus()
       await getNewsId()
+      await checkWaterNum()
       await getQuestionId()
       await guaList()
+      await checkWaterNum()
       await checkHomeJin()
+      await userInfo()
       await showmsg()
-    }
+        }
 
 })()
     .catch((e) => $.logErr(e))
@@ -122,7 +125,7 @@ return new Promise((resolve, reject) => {
    $.post(userInfo,async(error, response, data) =>{
      const userinfo = JSON.parse(data)
      if(response.statusCode == 200 && userinfo.code != -1){
-          $.log('\n🎉模擬登陸成功\n')
+$.log('\n🎉模擬登陸成功\n')
      notice += '🎉步步寶帳號: '+userinfo.username+'\n'+'🎉當前金幣: '+userinfo.jinbi+'💰 約'+userinfo.money+'元💸\n'
     }else{
      notice += '⚠️異常原因: '+userinfo.msg+'\n'
@@ -131,9 +134,6 @@ return new Promise((resolve, reject) => {
     })
    })
   } 
-
-
-
 
 
 function signIn() {
@@ -188,7 +188,7 @@ return new Promise((resolve, reject) => {
 }
    $.post(zaowandkinfo,async(error, response, data) =>{
      const zwdkinfo = JSON.parse(data)
-      if(zwdkinfo.code == 1 && zwdkinfo.is_daka == 0) {
+      if(zwdkinfo.code == 1 && zwdkinfo.is_dk == 0) {
       nowTime = zwdkinfo.now_time
       title1 = zwdkinfo.title1
       title2 = zwdkinfo.title2
@@ -233,9 +233,11 @@ return new Promise((resolve, reject) => {
      const clickdk = JSON.parse(data)
       if(clickdk.code == 1) {
           $.log('\n🎉'+clickdk.msg+'+ '+clickdk.jinbi+'💰\n')
-          $.msg(`🎉${title1}\n${title2}💰`,'','')
+          $.msg(`${title1}`,`${title2}`,'')
+          await checkWaterNum()
            }else{
           $.log('\n⚠️'+clickdk.msg)
+          await checkWaterNum()
            }
           resolve()
     })
@@ -253,15 +255,17 @@ return new Promise((resolve, reject) => {
    $.post(gualist,async(error, response, data) =>{
 $.log('\n🔔開始查詢刮刮卡ID\n')
      const guaid = JSON.parse(data)
-$.log('\n🔔查詢刮刮卡ID成功,5s後開始刮卡\n')
       if(guaid.ka > 0){
       for (guaId of guaid.list)
-      if(guaId.is_ad == 0)
-      guaID = guaId.id
+      if(guaId.is_ad == 0){
+      GID = guaId.id
+$.log('\n🔔查詢刮刮卡ID成功,5s後開始查询刮卡签名\n')
+$.log('\nGID: '+GID+'\n')
           await $.wait(5000)
           await guaDet()
-         }else{
+         }}else{
 $.log('\n⚠️刮刮卡已用完,請明天再刮吧！\n')
+          await checkWaterNum()
         }
 
           resolve()
@@ -275,7 +279,7 @@ return new Promise((resolve, reject) => {
   let guadet ={
     url: `https://bububao.duoshoutuan.com/gua/guadet?`,
     headers: JSON.parse(CookieVal),
-    body: `gid=${guaID}&`
+    body: `gid=${GID}&`
 }
    $.post(guadet,async(error, response, data) =>{
 $.log('\n🔔開始查詢刮卡簽名\n')
@@ -299,7 +303,7 @@ return new Promise((resolve, reject) => {
   let guapost ={
     url: `https://bububao.duoshoutuan.com/gua/guapost?`,
     headers: JSON.parse(CookieVal),
-    body: `sign=${SIGN}&gid=${guaID}&glid=${GLID}&`
+    body: `sign=${SIGN}&gid=${GID}&glid=${GLID}&`
 }
    $.post(guapost,async(error, response, data) =>{
 $.log('\n🔔開始刮卡\n')
@@ -330,7 +334,7 @@ $.log('\n🔔開始領取刮卡翻倍獎勵\n')
       if(guaka2.code == 1) {
           $.log('\n🎉刮卡翻倍成功,等待2s後查詢下一張刮刮卡ID\n')
           await $.wait(2000)
-          await guaList()
+          //await guaList()
            }else{
           $.log('\n⚠️刮卡翻倍失敗:'+guaka2.msg+'\n')
            }
@@ -447,14 +451,16 @@ $.log('\n🔔開始查詢睡覺狀態\n')
      }else{
 $.log('🔔大白天的就不要睡覺啦！')
       }
-      if(slpstatus.is_sleep == 0 && slpstatus.is_lq == 0 && now.getHours() >= 20) {
+      if(slpstatus.is_sleep == 0 && slpstatus.is_lq == 1 && now.getHours() >= 20) {
 $.log('🔔都幾點了，還不睡？5s後開始睡覺！')
           await $.wait(5000)
           await sleepStart()
-         }else if((slpstatus.is_sleep == 1 || slpstatus.is_sleep == 0)&& slpstatus.is_lq == 1 && now.getHours() >= 8 && now.getHours() <= 12){
+         }else if((slpstatus.is_sleep == 1 || slpstatus.is_sleep == 0)&& slpstatus.is_lq == 0 && now.getHours() >= 8 && now.getHours() <= 12){
 $.log('🔔都幾點了，還不起？5s後準備起床！')
           await $.wait(5000)
           await sleepEnd()
+         }else if(slpstatus.is_sleep == 0 && slpstatus.is_lq == 1 && now.getHours() >= 8 && now.getHours() <= 12){
+          await sleepDone()
          }else if(slpstatus.is_sleep == 1 && slpstatus.is_lq == 1 && now.getHours() >= 22){
           $.log('⚠️睡覺的時候不要玩手機！！！')
          }else if(slpstatus.is_sleep == 0 &&
@@ -500,7 +506,7 @@ return new Promise((resolve, reject) => {
 $.log('\n🔔開始起床\n')
       if(endsleep.code == 1) {
           $.log('\n🎉起床了！別睡了！\n')
-          await sleepDone()
+          await sleepStatus()
            }else{
           $.log('\n⚠️起床失敗:'+endsleep.msg+'\n')
            }
@@ -568,6 +574,7 @@ $.log('\n🔔每日觀看廣告任務狀態查詢成功,1s後查詢每日觀看�
           await checkDailyWatchAdId()
          }else{
           $.log('\n⚠️每日看廣告任務已上限\n')
+          await checkWaterNum()
          }
        resolve()
     })
@@ -709,15 +716,19 @@ return new Promise((resolve, reject) => {
 }
    $.post(checkhomejin,async(error, response, data) =>{
      const checkhomejb = JSON.parse(data)
-     if(checkhomejb.right_st !=2 && checkhomejb.right_time > 0){
+     if(checkhomejb.right_st == 0){
+          await homeJin()
+         }else if(checkhomejb.right_st == 1){
 $.log('\n🔔開始查詢首頁金幣狀態\n')
 $.log('\n🔔等待'+(checkhomejb.right_time+5)+'s领取首页金币')
           await $.wait(checkhomejb.right_time*1000+5000)
           await homeJin()
-         }else if(checkhomejb.right_st == 0 && checkhomejb.right_time <= 0){
-$.log('\n🔔開始查詢首頁金幣狀態\n')
-          await homeJin()
-         }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show != 2){
+         }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show == 0){
+$.log('\n🔔開始查詢首頁金蛋狀態\n')
+$.log('\n🔔等待'+(checkhomejb.jindan_djs+5)+'s领取金蛋獎勵')
+          await $.wait(checkhomejb.jindan_djs*1000+5000)
+          await checkGoldEggId()
+         }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show == 1){
 $.log('\n🔔開始查詢首頁金蛋狀態\n')
 $.log('\n🔔等待'+(checkhomejb.jindan_djs+5)+'s领取金蛋獎勵')
           await $.wait(checkhomejb.jindan_djs*1000+5000)
@@ -738,10 +749,9 @@ time = checkhomejb.hb_time+5
           }
           await $.wait(checkhomejb.hb_time*1000+5000)
           await checkRedBagId()
-         }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show == 2 && checkhomejb.hb_time < 0){
-          await checkRedBagId()
          }else if(checkhomejb.right_st == 2 && checkhomejb.jindan_show == 2 && checkhomejb.hb_st == 2){
 $.log('\n🔔首頁金幣狀態:'+checkhomejb.right_text+'\n🔔首頁紅包狀態:'+checkhomejb.hb_text+'\n🔔首頁金蛋狀態:'+checkhomejb.jindan_text+'\n')
+          await checkWaterNum()
          }
           resolve()
     })
@@ -1017,7 +1027,7 @@ return new Promise((resolve, reject) => {
    $.post(getnewsid,async(error, response, data) =>{
      const newsid = JSON.parse(data)
      if(newsid.code == 1){
-       if(newsid.is_first == 1 && newsid.is_max == 0){
+       if(newsid.is_max == 0){
           $.log('\n🔔開始查詢新聞ID\n')
           newsStr = newsid.nonce_str
           $.log('\n🎉新聞ID查詢成功,15s後領取閱讀獎勵\n')
@@ -1103,7 +1113,7 @@ $.log('\n🔔開始抽獎\n')
           await $.wait(5000)
           await luckyCallBack()
          }else{
-          await luckyClick()
+          await checkLuckNum()
          }
        }
           resolve()
@@ -1126,7 +1136,7 @@ $.log('\n🔔開始翻倍抽獎\n')
       if(callback.code == 1) {
           $.log('\n🎉抽獎翻倍成功\n')
           await $.wait(5000)
-          await luckyClick()
+          await checkLuckNum()
            }else{
           $.log('\n⚠️抽獎翻倍失敗:'+callback.msg+'\n')
            }
@@ -1264,7 +1274,6 @@ return new Promise((resolve, reject) => {
     headers: JSON.parse(CookieVal),
     body: `cy_id=${questionId}&site=${questionSite}&`,
 }
-//$.log('\nanswerqueBODY:'+answerque.body+'\n')
    $.post(answerque,async(error, response, data) =>{
      const answer = JSON.parse(data)
 $.log('\n🔔開始答題\n')
@@ -1291,7 +1300,6 @@ return new Promise((resolve, reject) => {
     headers: JSON.parse(CookieVal),
     body: `nonce_str=${answerStr}&tid=18&pos=1&`,
 }
-//$.log('\nanswerQueCallBackBODY:'+answerquecallback.body+'\n')
    $.post(answerquecallback,async(error, response, data) =>{
      const answerback = JSON.parse(data)
 $.log('\n🔔開始翻倍答題金幣\n')
@@ -1306,6 +1314,58 @@ $.log('\n🔔開始翻倍答題金幣\n')
     })
    })
   } 
+
+
+function cashCheck() {
+return new Promise((resolve, reject) => {
+  let timestamp=new Date().getTime();
+  let cashcheck ={
+    url: 'https://bububao.duoshoutuan.com/user/profile',
+    headers: JSON.parse(CookieVal),
+}
+   $.post(cashcheck,async(error, response, data) =>{
+     const cash = JSON.parse(data)
+     if(response.statusCode == 200 && cash.code != -1){
+if(cash.jinbi >= 500000){
+     tip = 50
+      await withDraw()
+     }else if(cash.day_jinbi > 5000){
+     tip = 0.3
+      await withDraw()
+     }
+           }
+          resolve()
+    })
+   })
+  } 
+
+
+
+
+function withDraw() {
+return new Promise((resolve, reject) => {
+  let timestamp=new Date().getTime();
+  let withdraw ={
+    url: `https://bububao.duoshoutuan.com/user/tixian?`,
+    headers: JSON.parse(CookieVal),
+    body: `tx=${tip}&`,
+}
+   $.post(withdraw,async(error, response, data) =>{
+$.log(data)
+     const draw = JSON.parse(data)
+      if(withdraw.code == 1) {
+           $.msg(draw.msg)
+          }else{
+           notice +=draw.tip+'\n'+draw.msg+'\n'
+          }
+          resolve()
+    })
+   })
+  } 
+
+
+
+
 
 
 
