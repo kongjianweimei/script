@@ -32,8 +32,8 @@ let videobody = $.getdata('videobody')
 let goldbody = $.getdata('goldbody')
 
 let tz = ($.getval('tz') || '1');//0关闭通知，1默认开启
-const invite=1;//新用户自动邀请，0关闭，1默认开启
-const logs =0;//0为关闭日志，1为开启
+//const invite=1;//新用户自动邀请，0关闭，1默认开启
+const logs =1;//0为关闭日志，1为开启
 var hour=''
 var minute=''
 var currentdate = ''
@@ -42,9 +42,7 @@ let headers;
 var gold = "0"
 var live = "0"
 let no;
-var video= '0'
-var coins= '0'
-let stop;
+var coins= '0';
 const liveid = '1348602411185672599'
 if ($.isNode()) {
    hour = new Date( new Date().getTime() + 8 * 60 * 60 * 1000 ).getHours();
@@ -58,7 +56,7 @@ let isGetCookie = typeof $request !== 'undefined'
 if (isGetCookie) {
    GetCookie();
    $.done()
-} 
+}
 if ($.isNode()) {
 //video
   if (process.env.VIDEOHEADER && process.env.VIDEOHEADER.indexOf('#') > -1) {
@@ -121,14 +119,15 @@ if (!videoheaderArr[0]) {
     $.msg($.name, '【提示】请先获取笑谱一cookie')
     return;
   }
-   
+
   //循环
  if ($.isNode()) {
   while(true){
-   console.log(`------------- 共${videoheaderArr.length}个账号----------------\n`)
+  console.log(`------------- 共${videoheaderArr.length}个账号----------------\n`)
   for (let i = 0; i < videoheaderArr.length; i++) {
     if (videoheaderArr[i]) {
       message = ''
+      gold = 0
       videoheader = videoheaderArr[i];
       videobody = videobodyArr[i];
       goldbody = goldbodyArr[i];
@@ -139,13 +138,15 @@ if (!videoheaderArr[0]) {
       await profit()
       await balance()
       await status()
+      await day_cash()
       await control()
       //await withdraw()
       //await watch_livevideo()
       await showmsg()
   }
  }
-      console.log(`========================本次任务执行完毕，休息1分钟==============================\n`);
+
+console.log(`========================本次任务执行完毕，休息1分钟==============================\n`);
       await $.wait(120000)
 
     }
@@ -154,6 +155,7 @@ if (!videoheaderArr[0]) {
   for (let i = 0; i < videoheaderArr.length; i++) {
     if (videoheaderArr[i]) {
       message = ''
+      gold = 0
       signheader = videoheaderArr[i];
       videobody = videobodyArr[i];
       $.index = i + 1;
@@ -175,6 +177,7 @@ if (!videoheaderArr[0]) {
 
 
 })()
+
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 function GetCookie() {
@@ -198,15 +201,15 @@ if($request.body.indexOf('isFinishWatch')&&$request.body.indexOf('"type":2')>=0)
  }
  }
 async function control(){
-   /*if(coins >= 1 && hour == 21){
+   if(cash>0 && coins >= cash && hour == 0 && draw == 1){
       await withdraw();
-}*/
-   if(goldbody && gold == 1){
+}
+   if(gold == 1){
       await watch_goldvideo();
    }else{
       await watch_video();
 }
-   if(no < 50 && hour >= 8 && hour <= 23){
+   if(no < 60 && hour >= 8 && hour < 23){
        await watch_livevideo();
 }
 }
@@ -221,7 +224,7 @@ return new Promise((resolve, reject) => {
      const result = JSON.parse(data)
         if(logs)$.log(data)
      message += '金币余额：'+result.data.coinSum+'\n现金余额：'+result.data.balanceSum/100+'\n'
-    coins = result.data.balanceSum/100;
+     coins = result.data.balanceSum/100;
           resolve()
     })
    })
@@ -356,18 +359,37 @@ return new Promise((resolve, reject) => {
   let withdrawurl ={
     url: `https://veishop.iboxpay.com/nf_gateway/nf_customer_activity/activity/v1/withdraw.json`,
     headers: JSON.parse(headers),
-    body: `{"source":"WX_APP_KA_HTZP","bizType":2,"amount":100}`
+    body: `{"source":"WX_APP_KA_HTZP","bizType":2,"amount":${cash*100}}`
 }
    $.post(withdrawurl,(error, response, data) =>{
      const result = JSON.parse(data)
        if(logs) $.log(data)
-          message += '📣一元提现\n'
+          message += '📣提现\n'
       if(result.resultCode == 1) {
           message += result.data.remark+'\n'
       }else{
           message +=message += result.data.remark+'\n'
            }
           resolve()
+    })
+   })
+  } 
+//day_cash
+function day_cash() {
+return new Promise((resolve, reject) => {
+  let day_cashurl ={
+    url: `https://veishop.iboxpay.com/nf_gateway/nf_customer_activity/day_cash/v1/in_out.json?date=${currentdate}&actTypeId=0&current=1&size=2`,
+    headers: JSON.parse(headers),
+}
+   $.get(day_cashurl,(error, response, data) =>{
+     const result = JSON.parse(data)
+       if(logs) $.log(data)
+       if(result.resultCode == 1) {
+       if(result.data.records.find(item => item.tradeTypeName === '提现')){
+       draw = 0
+       }
+          resolve()
+     }
     })
    })
   } 
