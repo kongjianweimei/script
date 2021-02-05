@@ -1,9 +1,9 @@
-name: xp_tianfang
+name: bbb
 
 on:
   workflow_dispatch:
   schedule:
-     - cron: '9 0 * * *'
+     - cron: '9 0-14 * * *'
   watch:
     types: started
 jobs:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        VIDEOHEADER: ${{ secrets.VIDEOHEADER }}
+        BBB_CK: ${{ secrets.BBB_CK }}
         TZ: Asia/shanghai
     steps:
       - name: Checkout
@@ -24,10 +24,10 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: '运行 【xp_tianfang】'
-        if: env.VIDEOHEADER
+      - name: '运行 【bbb】'
+        if: env.BBB_CK
         run: |
-          node scripts/xp.js
+          node scripts/bbb.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}

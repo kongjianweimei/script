@@ -1,9 +1,9 @@
-name: xp_tianfang
+name: txstock
 
 on:
   workflow_dispatch:
   schedule:
-     - cron: '9 0 * * *'
+     - cron: '39 1 * * *'
   watch:
     types: started
 jobs:
@@ -11,7 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        VIDEOHEADER: ${{ secrets.VIDEOHEADER }}
+        TX_USERHEADER: ${{ secrets.TX_USERHEADER }}
+        TX_USERKEY: ${{ secrets.TX_USERKEY }}        
+        TX_SIGNHEADER: ${{ secrets.TX_SIGNHEADER }}
+        TX_SIGNKEY: ${{ secrets.TX_SIGNKEY }}        
+        TX_TASKHEADER: ${{ secrets.TX_TASKHEADER }}        
+        TX_TASKKEY: ${{ secrets.TX_TASKKEY }}        
+        TX_WXTASKKEY: ${{ secrets.TX_WXTASKKEY }}        
         TZ: Asia/shanghai
     steps:
       - name: Checkout
@@ -24,10 +30,10 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: '运行 【xp_tianfang】'
-        if: env.VIDEOHEADER
+      - name: '运行 【txstock】'
+        if: env.TX_TASKHEADER
         run: |
-          node scripts/xp.js
+          node scripts/txstock.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}

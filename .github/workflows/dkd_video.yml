@@ -1,9 +1,9 @@
-name: xp_tianfang
+name: dkd_video
 
 on:
   workflow_dispatch:
   schedule:
-     - cron: '9 0 * * *'
+     - cron: '39 2 * * *'
   watch:
     types: started
 jobs:
@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        VIDEOHEADER: ${{ secrets.VIDEOHEADER }}
+        DKD_VIDEO_BD: ${{ secrets.DKD_VIDEO_BD }}
+        DKD_VIDEO_HD: ${{ secrets.DKD_VIDEO_HD }}     
+        DKD_SPHB_BD: ${{ secrets.DKD_SPHB_BD }}           
         TZ: Asia/shanghai
     steps:
       - name: Checkout
@@ -24,10 +26,10 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: '运行 【xp_tianfang】'
-        if: env.VIDEOHEADER
+      - name: '运行 【dkd_video】'
+        if: env.DKD_VIDEO_BD
         run: |
-          node scripts/xp.js
+          node scripts/dkd_video.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}

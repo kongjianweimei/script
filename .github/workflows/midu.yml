@@ -1,9 +1,9 @@
-name: xp_tianfang
+name: midu
 
 on:
   workflow_dispatch:
   schedule:
-     - cron: '9 0 * * *'
+     - cron: '29 * * * *'
   watch:
     types: started
 jobs:
@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        VIDEOHEADER: ${{ secrets.VIDEOHEADER }}
+        MIDU_TOKEN: ${{ secrets.MIDU_TOKEN }}
+        MIDU_TIME: ${{ secrets.MIDU_TIME }}    
+        MIDU_SIGN: ${{ secrets.MIDU_SIGN }}    
         TZ: Asia/shanghai
     steps:
       - name: Checkout
@@ -24,10 +26,10 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: '运行 【xp_tianfang】'
-        if: env.VIDEOHEADER
+      - name: '运行 【midu】'
+        if: env.MIDU_TOKEN
         run: |
-          node scripts/xp.js
+          node scripts/midu.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}
