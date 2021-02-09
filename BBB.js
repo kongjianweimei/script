@@ -30,7 +30,9 @@ hostname = bububao.duoshoutuan.com,
 
 const $ = new Env('步步寶')
 let notice = ''
-let CookieVal = $.getdata('bbb_ck')
+//let CookieVal = $.getdata('bbb_ck')
+
+let CookieVal = process.env.BBBCK
 
 if ($.isNode()) {
       console.log(`============ 脚本执行-国际标准时间(UTC)：${new Date().toLocaleString()}  =============\n`)
