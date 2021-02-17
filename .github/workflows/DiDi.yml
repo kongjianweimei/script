@@ -16,8 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        DIDI_CITY: ${{ secrets.DIDI_CITY}}
-        DIDI_TOKEN: ${{ secrets.DIDI_TOKEN }}
+        didi_token: ${{ secrets.didi_token}}
+        didi_city_id: ${{ secrets.didi_city_id }}
+        didi_lid: ${{ secrets.didi_lid }}
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js 10.x
@@ -30,7 +31,7 @@ jobs:
           npm install got #tough-cookie
       - name: ' 运行 【滴滴出行】'
         run: |
-          node DiDi.js
+          node didi.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}
