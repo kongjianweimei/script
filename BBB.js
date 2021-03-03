@@ -29,12 +29,13 @@ hostname = bububao.duoshoutuan.com,
 
 
 const $ = new Env('步步寶')
-const notify = $.isNode() ?require('./sendNotify') : '';
+ 
 let notice = ''
-let CookieVal = $.getdata('bbb_ck')
-
+//let CookieVal = $.getdata('bbb_ck')
+ 
+let CookieVal = process.env.BBBCK
+ 
 if ($.isNode()) {
-      CookieVal = process.env.BBB_ck.split()
       console.log(`============ 脚本执行-国际标准时间(UTC)：${new Date().toLocaleString()}  =============\n`)
       console.log(`============ 脚本执行-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`)
 }
